@@ -1,0 +1,76 @@
+@startuml class_diagram
+title Diagrama de Classes - Sistema de Gestao de E-commerce / Estoque
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+class Categoria {
+  - id_categoria : int
+  - nome_categoria : str
+  - departamento : str
+  --
+  + produtos : List<Produto>
+}
+
+class Produto {
+  - id_produto : int
+  - nome : str
+  - preco_unitario : decimal
+  - quantidade_estoque : int
+  - id_categoria : int
+  --
+  + categoria : Categoria
+  + detalhe : DetalheProduto
+  + itens_pedido : List<ItemPedido>
+}
+
+class DetalheProduto {
+  - id_detalhe : int
+  - id_produto : int <<unique>>
+  - peso_kg : decimal
+  - dimensoes_cm : str
+  - garantia_meses : int
+  --
+  + produto : Produto
+}
+
+class Pedido {
+  - id_pedido : int
+  - data_pedido : date
+  - status_pedido : str
+  --
+  + itens : List<ItemPedido>
+}
+
+class ItemPedido {
+  - id_item_pedido : int
+  - id_produto : int
+  - id_pedido : int
+  - quantidade : int
+  - preco_aplicado : decimal
+  --
+  + produto : Produto
+  + pedido : Pedido
+}
+
+' ---- Relacionamentos ----
+
+Categoria "1" *-- "N" Produto : possui >
+Produto "1" -- "1" DetalheProduto : possui >
+Produto "1" -- "N" ItemPedido
+Pedido "1" -- "N" ItemPedido
+Produto "N" .. "M" Pedido : presente em\n(via ItemPedido)
+
+note bottom of ItemPedido
+  Classe associativa que resolve
+  o relacionamento N:M entre
+  Produto e Pedido, carregando
+  atributos proprios (quantidade,
+  preco_aplicado).
+end note
+
+@enduml
